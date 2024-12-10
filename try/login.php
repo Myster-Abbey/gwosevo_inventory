@@ -13,17 +13,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password=$_POST['password'];
 
     $sql="Select * from `users` where 
-    email='$email' and password='$password'";
+    email='$email' limit 1";
 
     $result=mysqli_query($con,$sql);
+
     if($result){
         $num=mysqli_num_rows($result);
-        if($num>0){
+        $data = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+        if(count($data) > 0){
             // echo "Login successful";
+            if (password_verify($password, $data[0]['password'])) {
             $login=1;
             session_start();
             $_SESSION['email']=$email;
             header('location:dashboard.php');
+            # code...
+            } else {
+                $invalid=1;
+            }
         }else{
             // echo "Invalid data";
             $invalid=1;

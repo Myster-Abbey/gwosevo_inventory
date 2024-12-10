@@ -22,7 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // echo "User already exist";
             $user=1;
         }else{
-            $sql = "INSERT INTO `users` (username, email, password) VALUES ('$username', '$email', '$password')";
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+            $sql = "INSERT INTO `users` (username, email, password) VALUES ('$username', '$email', '$hashedPassword')";
             $result=mysqli_query($con,$sql);
         
             if($result){
