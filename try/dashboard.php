@@ -184,17 +184,6 @@ if(isset($_POST['submit'])){
             background-color: darkred;
         }
 
-        button#Update-btn{
-            background-color: green;
-            color: white;
-            border: none;
-            padding: 5px 20px;
-            font-size: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
         button#Update-btn:hover {
             background-color: greenyellow;
         }
@@ -277,6 +266,135 @@ if(isset($_POST['submit'])){
         .popup .form-group input[type="submit"]:hover {
             background-color: darkblue;
         }
+
+        /* Basic styles for the update popup */
+                /* Style for the update button */
+                button#ussdaddButton {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 5px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+
+        button#ussdaddButton:hover {
+            background-color: greenyellow;
+        }
+
+        button#ussdDelete-btn{
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button#ussdDelete-btn:hover {
+            background-color: darkred;
+        }
+
+        button#ussdUpdate-btn{
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 5px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button#ussdUpdate-btn:hover {
+            background-color: greenyellow;
+        }
+
+        /* Basic styles for the popup */
+        .ussdpopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background-color: #f9f9f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Overlay styling */
+        .ussdpopup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Close button */
+        .ussdpopup .ussdclose-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+            transition: background-color 0.3s ease;
+        }
+
+        .ussdpopup .ussdclose-btn:hover {
+            background-color: darkred;
+        }
+
+        /* Form input styling */
+        .ussdpopup .ussdform-group {
+            margin-bottom: 15px;
+        }
+
+        .ussdpopup .ussdform-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #333;
+        }
+
+        .ussdpopup .ussdform-group input[type="text"],
+        .ussdpopup .ussdform-group input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .ussdpopup .ussdform-group input[type="submit"] {
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .ussdpopup .ussdform-group input[type="submit"]:hover {
+            background-color: darkblue;
+        }
+
+        /* --- Update popup END--- */
 
         /* USSD table style */
                 
@@ -438,7 +556,7 @@ if(isset($_POST['submit'])){
     <!-- Pop-Up Overlay -->
     <div class="popup-overlay" id="popupOverlay"></div>
 
-    <!-------------------------- Add USSD Pop-Up Form ---------------------- ---- -->
+            <!-------------------------- Add USSD Pop-Up Form ---------------------- ---- -->
     <div class="popup" id="popup">
         <button class="close-btn" id="closePopup">X</button>
         <form method="post">
@@ -461,30 +579,61 @@ if(isset($_POST['submit'])){
     </div>
             <!-------------------------- End Add-USSD Pop-Up Form ---------------------- ---- -->
 
-            <!--------------------------  USSD Update-Pop-Up Form ---------------------- ---- -->
-                <div class="popup" id="popup">
-            <button class="close-btn" id="closePopup">X</button>
-                    <form method="post">
-                        <div class="form-group">
-                            <label>Campaign</label>
-                            <input type="text" class="form-control" placeholder="Campaign" name="campaign">
-                        </div>
-                        <div class="form-group">
-                            <label>Shortcode</label>
-                            <input type="text" class="form-control" placeholder="Shortcode" name="shortcode">
-                        </div>
-                        <div class="form-group">
-                            <label>Database name</label>
-                            <input type="text" class="form-control" placeholder="DB Name" name="dbname">
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" class="form-control" name="Update">
-                        </div>
-                    </form>
-             </div>
+            <!-- ----------------------------END Update ussd popup form ---------------------------------- -->
+<!-- Pop-Up Overlay -->
+<div class="ussdpopup-overlay" id="ussdpopupOverlay"></div>
+<div class="ussdpopup" id="ussdpopup">
+        <button class="ussdclose-btn" id="closePopup">X</button>
+        <form method="post">
+            <div class="ussdform-group">
+                <label>Campaign</label>
+                <input type="text" class="ussdform-control" placeholder="Campaign" name="campaign">
+            </div>
+            <div class="ussdform-group">
+                <label>Shortcode</label>
+                <input type="text" class="ussdform-control" placeholder="Shortcode" name="shortcode">
+            </div>
+            <div class="ussdform-group">
+                <label>Database name</label>
+                <input type="text" class="ussdform-control" placeholder="DB Name" name="dbname">
+            </div>
+            <div class="ussdform-group">
+                <input type="submit" class="ussdform-control" name="submit">
+            </div>
+        </form>
+    </div>
+            <!-- ----------------------------END Update popup form ---------------------------------- -->
+            
+            <!-- ----------------------------  Update ussd popup Script ---------------------------------- -->
+    <script>
+        
+        // Get elements
+        const ussdaddButton = document.getElementById('ussdaddButton');
+        const ussdpopup = document.getElementById('ussdpopup');
+        const ussdpopupOverlay = document.getElementById('ussdpopupOverlay');
+        const ussdclosePopup = document.getElementById('ussdclosePopup');
 
+        // Open popup
+        ussdaddButton.addEventListener('click', () => {
+            ussdpopup.style.display = 'block';
+            ussdpopupOverlay.style.display = 'block';
+        });
 
-            <!-------------------------- End USSD Pop-Up Form ---------------------- ---- -->
+        // Close popup
+        ussdclosePopup.addEventListener('click', () => {
+            ussdpopup.style.display = 'none';
+            ussdpopupOverlay.style.display = 'none';
+        });
+
+        // Close popup when clicking on overlay
+        ussdpopupOverlay.addEventListener('click', () => {
+            ussdpopup.style.display = 'none';
+            ussdpopupOverlay.style.display = 'none';
+        });
+    </script>
+       <!-- ----------------------------  End Update ussd popup Script ---------------------------------- -->
+   
+            <!-- --------------------------------- script add USSD content ------------------------------- -->
     <script>
         // Get elements
         const addButton = document.getElementById('addButton');
@@ -510,7 +659,9 @@ if(isset($_POST['submit'])){
             popupOverlay.style.display = 'none';
         });
     </script>
-    <!-------------------------------- USSD table display ------------------------------  -->
+        <!--------------------------------- end-script add USSD content ---------------------------- -->
+
+         <!-------------------------------- USSD table display ------------------------------  -->
 
             <h2>Responsive Table</h2>
         <div class="table-wrapper">
@@ -542,7 +693,8 @@ if(isset($_POST['submit'])){
                             <td>'.$shortcode.'</td>
                             <td>'.$dbname.'</td>
                             <td>
-                                <button id="Update-btn"><a href="update.php?updateid='.$id.'">Update</a></button>
+                            
+                                <button id="ussdaddButton"><a href="update.php?updateid='.$id.'">Update</a></button>
                                 <button id="Delete-btn"><a href="delete.php?deleteid='.$id.'">Delete</a></button>
 
                             </td>
@@ -557,10 +709,11 @@ if(isset($_POST['submit'])){
                 <tbody> 
             </table>
         </div>
-
+                <!-- --------------------------------------------- USSD UPDATE SCRIPT ----------------------------------- -->
+                    
 
     <!-- --------------------------------End of USSD dashboard----------------------------------------------- -->
-        </div>
+       
 
         <div class="dashboard" id="websites-dashboard">
             <h2>Web Applications Dashboard</h2>

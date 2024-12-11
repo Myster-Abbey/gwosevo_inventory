@@ -1,35 +1,17 @@
-<?php 
-session_start();
-if(!isset($_SESSION['email'])){
-    header('location:login.php');
-}
 
-include 'connect.php';
-if(isset($_POST['submit'])){
-    $Campaign=$_POST['campaign'];
-    $Shortcode=$_POST['shortcode'];
-    $Dbname=$_POST['dbname'];
 
-    $sql="insert into `ussd`(campaign,shortcode,dbname)
-    values('$Campaign','$Shortcode','$Dbname')";
-    $result=mysqli_query($con,$sql);
-    if($result){
-        header('location:dashboard.php');
-    }else{
-        die(mysqli_error($con));
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- HTML: Head Section -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Dashboard</title>
     <link rel="icon" type="image/png" href="image.png">
     <style>
-         /* Button styles */
-        button {
+        /* Basic styles for the update popup */
+                /* Style for the update button */
+                button#ussdaddButton {
             background-color: green;
             color: white;
             border: none;
@@ -40,13 +22,44 @@ if(isset($_POST['submit'])){
             transition: background-color 0.3s ease;
         }
 
-        button:hover {
+
+        button#ussdaddButton:hover {
             background-color: greenyellow;
         }
 
-        /* Popup styles */
+        button#ussdDelete-btn{
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button#ussdDelete-btn:hover {
+            background-color: darkred;
+        }
+
+        button#ussdUpdate-btn{
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 5px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button#ussdUpdate-btn:hover {
+            background-color: greenyellow;
+        }
+
+        /* Basic styles for the popup */
         .popup {
-            display: none;
+            display: block;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -57,10 +70,12 @@ if(isset($_POST['submit'])){
             padding: 20px;
             border-radius: 12px;
             z-index: 1000;
+            font-family: Arial, sans-serif;
         }
 
+        /* Overlay styling */
         .popup-overlay {
-            display: none;
+            display: block;
             position: fixed;
             top: 0;
             left: 0;
@@ -70,177 +85,116 @@ if(isset($_POST['submit'])){
             z-index: 999;
         }
 
-        /* Table styles */
-        h2 {
-            text-align: center;
-            font-size: 18px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Close button */
+        .popup .ussdclose-btn {
+            background: red;
             color: white;
-            padding: 30px 0;
-        }
-
-        .table-wrapper {
-            margin: 10px 70px 70px;
-            box-shadow: 0px 35px 50px rgba(0, 0, 0, 0.2);
-        }
-
-        .fl-table {
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: normal;
             border: none;
-            border-collapse: collapse;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+            transition: background-color 0.3s ease;
+        }
+
+        .popup .ussdclose-btn:hover {
+            background-color: darkred;
+        }
+
+        /* Form input styling */
+        .popup .ussdform-group {
+            margin-bottom: 15px;
+        }
+
+        .popup .ussdform-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #333;
+        }
+
+        .popup .ussdform-group input[type="text"],
+        .popup .ussdform-group input[type="submit"] {
             width: 100%;
-            max-width: 100%;
-            white-space: nowrap;
-            background-color: white;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
         }
 
-        .fl-table td, .fl-table th {
-            text-align: center;
-            padding: 8px;
+        .popup .ussdform-group input[type="submit"] {
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .fl-table td {
-            border-right: 1px solid #f8f8f8;
-            font-size: 12px;
+        .popup .ussdform-group input[type="submit"]:hover {
+            background-color: darkblue;
         }
 
-        .fl-table thead th {
-            color: #ffffff;
-            background: #4FC3A1;
-        }
-
-        .fl-table tr:nth-child(even) {
-            background: #F8F8F8;
-        }
-
-        /* Responsive styles */
-        @media (max-width: 767px) {
-            .fl-table {
-                display: block;
-                width: 100%;
-            }
-
-            .table-wrapper:before {
-                content: "Scroll horizontally >";
-                display: block;
-                text-align: right;
-                font-size: 11px;
-                color: white;
-                padding: 0 0 10px;
-            }
-        }
+        /* --- Update popup END--- */
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <img src="image.png" alt="Logo">
-            <h1>Inventory</h1>
-        </div>
-        <nav>
-            <a href="#">USSD</a>
-            <a href="#">Web Applications</a>
-            <a href="#">Mobile Apps</a>
-        </nav>
-        <a class="logout" href="logout.php">Logout</a>
+<!-- <button id="ussdaddButton">Update</button> -->
+    <!-- ----------------------------END Update popup form ---------------------------------- -->
+
+<!-- Pop-Up Overlay -->
+<div class="popup-overlay" id="popupOverlay"></div>
+<div class="popup" id="popup">
+        <button class="ussdclose-btn" id="closePopup">X</button>
+        <form method="post">
+            <div class="ussdform-group">
+                <label>Campaign</label>
+                <input type="text" class="ussdform-control" placeholder="Campaign" name="campaign">
+            </div>
+            <div class="ussdform-group">
+                <label>Shortcode</label>
+                <input type="text" class="ussdform-control" placeholder="Shortcode" name="shortcode">
+            </div>
+            <div class="ussdform-group">
+                <label>Database name</label>
+                <input type="text" class="ussdform-control" placeholder="DB Name" name="dbname">
+            </div>
+            <div class="ussdform-group">
+                <input type="submit" class="ussdform-control" name="submit">
+            </div>
+        </form>
     </div>
 
-    <div class="content">
-        <div class="header">
-            <h1>Inventory Dashboard</h1>
-        </div>
+    <!-- ----------------------------END Update ussd popup form ---------------------------------- -->
 
-        <h2>Responsive Table</h2>
-        <div class="table-wrapper">
-            <table class="fl-table">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Campaign</th>
-                        <th>Shortcode</th>
-                        <th>Database name</th>
-                        <th>Operations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    $sql="Select * from `ussd`";
-                    $result=mysqli_query($con,$sql);
-                    if($result){
-                        while($row=mysqli_fetch_assoc($result)){
-                            $id=$row['id'];
-                            $campaign=$row['campaign'];
-                            $shortcode=$row['shortcode'];
-                            $dbname=$row['dbname'];
-
-                            echo '<tr>
-                                <td>'.$id.'</td>
-                                <td>'.$campaign.'</td>
-                                <td>'.$shortcode.'</td>
-                                <td>'.$dbname.'</td>
-                                <td>
-                                    <button class="update-btn" onclick="openUpdatePopup('.$id.')">Update</button>
-                                    <button class="delete-btn"><a href="delete.php?deleteid='.$id.'">Delete</a></button>
-                                </td>
-                            </tr>';
-                        }
-                    }
-                    ?>
-                </tbody> 
-            </table>
-        </div>
-
-        <!-- Popup overlay and form -->
-        <div class="popup-overlay" id="popupOverlay"></div>
-        <div class="popup" id="updatePopup">
-            <button class="close-btn" id="closePopup">X</button>
-            <form method="post">
-                <div class="form-group">
-                    <label>Campaign</label>
-                    <input type="text" name="campaign" placeholder="Campaign">
-                </div>
-                <div class="form-group">
-                    <label>Shortcode</label>
-                    <input type="text" name="shortcode" placeholder="Shortcode">
-                </div>
-                <div class="form-group">
-                    <label>Database Name</label>
-                    <input type="text" name="dbname" placeholder="DB Name">
-                </div>
-                <div class="form-group">
-                    <input type="submit" name="Update" value="Update">
-                </div>
-            </form>
-        </div>
-    </div>
-
+        <!-- ----------------------------  Update ussd popup Script ---------------------------------- -->
     <script>
+        
         // Get elements
+        // const ussdaddButton = document.getElementById('ussdaddButton');
+        const popup = document.getElementById('popup');
         const popupOverlay = document.getElementById('popupOverlay');
-        const updatePopup = document.getElementById('updatePopup');
         const closePopup = document.getElementById('closePopup');
 
-        // Open the update popup
-        function openUpdatePopup(id) {
-            // Open update popup logic (you can pass the `id` to pre-fill the form if needed)
-            updatePopup.style.display = 'block';
-            popupOverlay.style.display = 'block';
-        }
+        // // Open popup
+        // ussdaddButton.addEventListener('click', () => {
+        //     popup.style.display = 'block';
+        //     popupOverlay.style.display = 'block';
+        // });
 
-        // Close the popup
+        // Close popup
         closePopup.addEventListener('click', () => {
-            updatePopup.style.display = 'none';
+            popup.style.display = 'none';
             popupOverlay.style.display = 'none';
         });
 
-        // Close the popup when clicking on overlay
+        // Close popup when clicking on overlay
         popupOverlay.addEventListener('click', () => {
-            updatePopup.style.display = 'none';
+            popup.style.display = 'none';
             popupOverlay.style.display = 'none';
         });
     </script>
+       <!-- ----------------------------  End Update ussd popup Script ---------------------------------- -->
 </body>
 </html>
